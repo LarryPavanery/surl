@@ -1,0 +1,9 @@
+coverage>=4.1
+ddt
+nose
+pyyaml
+requests
+six
+testtools
+ujson
+fake-factory==0.5.7
