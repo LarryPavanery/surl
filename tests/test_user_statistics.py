@@ -15,19 +15,15 @@ class TestManagerURL(TestBase):
 
     def tearDown(self):
         super(TestManagerURL, self).tearDown()
-    
-    def create_user_and_shorturl(self):
-        self.user_id = self.create_user()
-        self.response = self.post_url()
         
     def create_user(self):
-        user_id = utils.fake_name()
+        self.user_id = utils.fake_name()
         path = '/users'
-        body = utils.encode_obj({'id': user_id})
+        body = utils.encode_obj({'id': self.user_id})
         headers = {'Content-Type': 'application/json'}
         response = self.simulate_post(path, body=body, headers=headers)
         response_user_id = utils.decode_obj(response[0])['id']
-        self.assertEquals(user_id, response_user_id)
+        self.assertEquals(self.user_id, response_user_id)
         self.assertEqual(self.srmock.status, falcon.HTTP_201)
         return response_user_id
         
@@ -38,29 +34,18 @@ class TestManagerURL(TestBase):
         headers = {'Content-Type': 'application/json'}
         return self.simulate_post(path, body=body, headers=headers)
         
-    def get_urls(self):
-        self.id_surl = utils.decode_obj(self.response[0])['shorturl'].split('/')[-1]
-        path = '/urls/{0}'.format(self.id_surl)
-        self.simulate_request(path)
-        self.assertEqual(self.srmock.status, falcon.HTTP_301)
-        
-    def get_stats(self):
-        path = '/stats/{0}'.format(self.id_surl)
+    def get_stats_by_userid(self):
+        path = '/users/{0}/stats'.format(self.user_id)
         self.response_get_stats = self.simulate_request(path)
         self.assertEqual(self.srmock.status, falcon.HTTP_200)
-        self.hits = utils.decode_obj(self.response_get_stats[0])['hits']
+        self.stats = utils.decode_obj(self.response_get_stats[0])
+
+    def test_get_users_stats_by_userid(self):
+        self.create_user()
+        for i in range(10):
+            self.post_url()
+        self.get_stats_by_userid()
+        self.assertEqual(len(self.stats), 10)
         
-    def increment_hits(self):
-        self.get_urls()
-        self.get_stats()
-        
-    def test_get_stats_by_id(self):
-        self.create_user_and_shorturl()
-        self.increment_hits()
-        self.assertEqual(self.hits, 1)
-        self.increment_hits()
-        self.assertEqual(self.hits, 2)
-        for i in range(1000):
-            self.increment_hits()
-        self.assertEqual(self.hits, 1002)
+
         

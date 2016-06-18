@@ -15,6 +15,7 @@ class URLDB(AbstractRedisdb):
         self.id_auto_inc_name = 'id_url_auto_increment'
 
     def get(self, id):
+        '''TODO: change the key to be just the hash'''
         key = '%s%s' % (root_url(), id)
         return super(URLDB, self).get(key)
 
