@@ -7,7 +7,6 @@ import datetime
 import falcon
 import surl.helpers.shared as utils
 
-from surl.endpoints.manager_user import ManagerUser
 from base import TestBase
         
 class TestManagerUser(TestBase):

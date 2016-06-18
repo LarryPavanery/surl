@@ -5,15 +5,19 @@ __author__ = "Larry_Pavanery
 
 from abstract_redis_database import AbstractRedisdb
 from surl.model.url import URL
+from surl.helpers.shared import root_url
 
 
 class URLDB(AbstractRedisdb):
 
     def __init__(self):
         super(URLDB, self).__init__()
+        self.id_auto_inc_name = 'id_url_auto_increment'
 
-    def create(self, id, url, shorturl):
-        key = shorturl
-        value = URL(id, url, shorturl)
-        return super(URLDB, self).create(key, value)
+    def get(self, id):
+        key = '%s%s' % (root_url(), id)
+        return super(URLDB, self).get(key)
 
+    def save(self, url, shorturl):
+        url_id = self.next_id(self.id_auto_inc_name)
+        return super(URLDB, self).save(shorturl, URL(url_id, url, shorturl))

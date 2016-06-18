@@ -5,8 +5,6 @@ __author__ = "Larry_Pavanery
 
 
 class User(object):
-    def __init__(self, id):
+    def __init__(self, id, url_keys=[]):
         self.id = id
-
-    def __repr__(self):
-        return '{\'id\': %s}' % (self.id)
+        self.url_keys = url_keys

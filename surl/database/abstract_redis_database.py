@@ -7,7 +7,6 @@ from redis import Redis, ConnectionPool
 
 import abc
 import six
-import ujson as json
 import surl.helpers.shared as utils
 
 
@@ -19,13 +18,17 @@ class AbstractRedisdb():
         self._redis_pool = ConnectionPool(host=self.conf['host'], port=self.conf['port'], db=0)
 
     def get(self, key):
-        return Redis(connection_pool=self._redis_pool).get(key)
+        value = Redis(connection_pool=self._redis_pool).get(key)
+        try:
+            return utils.decode_obj(value)
+        except:
+            return value
 
-    def create(self, key, value):
+    def save(self, key, value):
         try:
             Redis(connection_pool=self._redis_pool).set(key, utils.encode_obj(value))
             return value
-        except Exception as e:
+        except Exception:
             return None
 
     def delete(self, key):
@@ -37,3 +40,7 @@ class AbstractRedisdb():
 
     def exists(self, key):
         return Redis(connection_pool=self._redis_pool).exists(key)
+
+    def next_id(self, id_auto_inc_name):
+        Redis(connection_pool=self._redis_pool).incr(id_auto_inc_name)
+        return Redis(connection_pool=self._redis_pool).get(id_auto_inc_name)

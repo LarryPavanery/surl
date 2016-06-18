@@ -25,20 +25,22 @@ class ManagerUser(BaseResponse):
     def _save(self, resp, req):
         data = decode_obj(req.stream.read())
 
-        if 'id' in data:
-            user_id = data['id']
-            if not self.db.exists(user_id):
-                user = self.db.create(user_id)
-                if user:
-                    self.return_body(resp, user, falcon.HTTP_201)
-                else:
-                    raise falcon.HTTPError(falcon.HTTP_400, 'User not created',
-                                    'Please try again or contact support')
-            else:
-                resp.status = falcon.HTTP_409
-        else:
+        if 'id' not in data:
             raise falcon.HTTPError(falcon.HTTP_400, 'No identifier',
                             'Could not decode the request body. The JSON was incorrect')
+
+        user_id = data['id']
+        if not self.db.exists(user_id):
+            new_user = self.db.save(user_id)
+            if new_user:
+                user_json = {}
+                user_json['id'] = new_user.id
+                self.return_body(resp, user_json, falcon.HTTP_201)
+            else:
+                raise falcon.HTTPError(falcon.HTTP_400, 'User not created',
+                                'Please try again or contact support')
+        else:
+            resp.status = falcon.HTTP_409
 
     def _delete(self, resp, user_id):
         if self.db.exists(user_id):

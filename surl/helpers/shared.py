@@ -16,10 +16,12 @@ import ujson as json
 
 
 def shorturl(url):
-    return  root_url() + base64_url(url)
+    return '%s%s' % (root_url(), base64_url(url))
+
 
 def base64_url(url):
-    return base64.b64encode(url[5:15])
+    return base64.b64encode(url)
+
 
 def root_url():
     ini = load_env()
@@ -28,18 +30,22 @@ def root_url():
         root += ':%s/' % (ini['port'])
     return root
 
+
 def load_configs():
     configs = RawConfigParser()
     configs.read('etc/api-config.conf')
     return configs
-    
+
+
 def load_ini():
     configs = RawConfigParser()
     configs.read('etc/api-config.ini')
     return configs
 
+
 def load_env():
     return dict(load_ini().items('server:main'))
+
 
 def load_references():
     configs = load_configs()
@@ -60,6 +66,7 @@ def log_enable():
     print(load_configs())
     return configs.get('DEFAULT', 'debug').lower() == 'true'
 
+
 def encode_obj(obj):
     return json.dumps(obj, ensure_ascii=False).encode('utf8')
 
@@ -75,6 +82,7 @@ def timestamp():
 def fake_name():
     fake = Factory.create('en_US')
     return fake.name()
+
 
 def fake_url():
     fake = Factory.create('en_US')
