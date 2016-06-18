@@ -16,12 +16,6 @@ class TestManagerURL(TestBase):
     def tearDown(self):
         super(TestManagerURL, self).tearDown()
     
-    def get_urls(self):
-        id_surl = utils.decode_obj(self.response[0])['shorturl'].split('/')[-1]
-        path = '/urls/{0}'.format(id_surl)
-        self.simulate_request(path)
-        self.assertEqual(self.srmock.status, falcon.HTTP_301)
-        
     def create_user_and_shorturl(self):
         self.user_id = self.create_user()
         self.response = self.post_url()
@@ -43,14 +37,30 @@ class TestManagerURL(TestBase):
         body = utils.encode_obj({'url': url})
         headers = {'Content-Type': 'application/json'}
         return self.simulate_post(path, body=body, headers=headers)
-                
-    def test_get_urls_404(self):
-        url_id = '_test_url_id_'
-        path = '/urls/{0}'.format(url_id)
-        response = self.simulate_request('/urls/{id}')
-        self.assertEqual(self.srmock.status, falcon.HTTP_404)
+        
+    def get_urls(self):
+        self.id_surl = utils.decode_obj(self.response[0])['shorturl'].split('/')[-1]
+        path = '/urls/{0}'.format(self.id_surl)
+        self.simulate_request(path)
+        self.assertEqual(self.srmock.status, falcon.HTTP_301)
+        
+    def get_stats(self):
+        path = '/stats/{0}'.format(self.id_surl)
+        self.response_get_stats = self.simulate_request(path)
+        self.assertEqual(self.srmock.status, falcon.HTTP_200)
+        self.hits = utils.decode_obj(self.response_get_stats[0])['hits']
+        
+    def increment_hits(self):
+        self.get_urls()
+        self.get_stats()
         
     def test_get_urls_301(self):
         self.create_user_and_shorturl()
-        self.get_urls()
+        self.increment_hits()
+        self.assertEqual(self.hits, 1)
+        self.increment_hits()
+        self.assertEqual(self.hits, 2)
+        for i in range(1000):
+            self.increment_hits()
+        self.assertEqual(self.hits, 1002)
         

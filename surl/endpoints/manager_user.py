@@ -26,8 +26,11 @@ class ManagerUser(BaseResponse):
         data = decode_obj(req.stream.read())
 
         if 'id' not in data:
-            raise falcon.HTTPError(falcon.HTTP_400, 'No identifier',
-                            'Could not decode the request body. The JSON was incorrect')
+            raise falcon.HTTPError(
+                falcon.HTTP_400,
+                'No identifier',
+                'Could not decode the request body. The JSON was incorrect'
+            )
 
         user_id = data['id']
         if not self.db.exists(user_id):
@@ -37,8 +40,11 @@ class ManagerUser(BaseResponse):
                 user_json['id'] = new_user.id
                 self.return_body(resp, user_json, falcon.HTTP_201)
             else:
-                raise falcon.HTTPError(falcon.HTTP_400, 'User not created',
-                                'Please try again or contact support')
+                raise falcon.HTTPError(
+                    falcon.HTTP_400,
+                    'User not created',
+                    'Please try again or contact support'
+                )
         else:
             resp.status = falcon.HTTP_409
 
@@ -46,4 +52,8 @@ class ManagerUser(BaseResponse):
         if self.db.exists(user_id):
             self.db.delete(user_id)
         else:
-            raise falcon.HTTPError(falcon.HTTP_404, 'User not found', 'Request did not return any records')
+            raise falcon.HTTPError(
+                falcon.HTTP_404,
+                'User not found',
+                'Request did not return any records'
+            )

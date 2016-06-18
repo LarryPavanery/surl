@@ -23,6 +23,7 @@ class ManagerURL(BaseResponse):
 
         url = self.url_db.get(id)
         if url:
+            self.url_db.increment_hits(id)
             resp.status = falcon.HTTP_301
             resp.set_header('Location', url['url'])
         else:
@@ -40,34 +41,48 @@ class ManagerURL(BaseResponse):
         data = utils.decode_obj(req.stream.read())
 
         if not self.user_db.exists(user_id):
-            raise falcon.HTTPError(falcon.HTTP_404, 'User not found', 
-                            'Request did not return any records')
+            raise falcon.HTTPError(
+                falcon.HTTP_404,
+                'User not found',
+                'Request did not return any records'
+            )
 
         if 'url' not in data:
-            raise falcon.HTTPError(falcon.HTTP_400, 'No identifier',
-                            'Could not decode the request body. The JSON was incorrect')
+            raise falcon.HTTPError(
+                falcon.HTTP_400,
+                'No identifier',
+                'Could not decode the request body. The JSON was incorrect'
+            )
 
         url = data['url']
         shorturl = utils.shorturl(url)
         if self.user_db.user_has_url(user_id, shorturl):
-            raise falcon.HTTPError(falcon.HTTP_409, 'The URL exists in system',
-                            'Please try with another URL')
+            raise falcon.HTTPError(
+                falcon.HTTP_409,
+                'The URL exists in system',
+                'Please try with another URL'
+            )
 
         if not self.url_db.exists(shorturl):
             new_url = self.url_db.save(url, shorturl)
             if new_url:
                 self.return_body(resp, new_url, falcon.HTTP_201)
             else:
-                raise falcon.HTTPError(falcon.HTTP_400, 'Short URL not created',
-                                'Please try again or contact support')
+                raise falcon.HTTPError(
+                    falcon.HTTP_400,
+                    'Short URL not created',
+                    'Please try again or contact support'
+                )
 
-        #TODO Facade pattern? to manager persister...
+        '''TODO Facade pattern? to manager persister...'''
         self.user_db.update_user(user_id, shorturl)
 
     def _delete(self, resp, url_id):
         id = utils.root_url() + url_id
         if not self.url_db.exists(id):
-            raise falcon.HTTPError(falcon.HTTP_404, 'Short URL not found', 
-                            'Request did not return any records')
+            raise falcon.HTTPError(
+                falcon.HTTP_404,
+                'Short URL not found',
+                'Request did not return any records'
+            )
         self.url_db.delete(id)
-

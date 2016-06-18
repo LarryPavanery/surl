@@ -21,3 +21,9 @@ class URLDB(AbstractRedisdb):
     def save(self, url, shorturl):
         url_id = self.next_id(self.id_auto_inc_name)
         return super(URLDB, self).save(shorturl, URL(url_id, url, shorturl))
+
+    def increment_hits(self, id):
+        url = self.get(id)
+        update_hits = URL(url['id'], url['url'], url['shorturl'], url['hits'])
+        update_hits.increment_hits()
+        return super(URLDB, self).save(url['shorturl'], update_hits)

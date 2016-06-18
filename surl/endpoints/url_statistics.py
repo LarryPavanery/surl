@@ -3,12 +3,22 @@
 __author__ = "Larry_Pavanery
 '''
 
-import falcon
 from base_response import BaseResponse
+from surl.database.url_db import URLDB
+
+import falcon
 
 
 class URLStatistics(BaseResponse):
+    def __init__(self):
+        super(URLStatistics, self).__init__()
+        self.url_db = URLDB()
 
-    def on_get(self, req, resp):
+    def on_get(self, req, resp, id):
         """ GET /stats/:id """
-        print ('UserStatistics')
+
+        url = self.url_db.get(id)
+        if url:
+            self.return_body(resp, url, falcon.HTTP_200)
+        else:
+            resp.status = falcon.HTTP_404
