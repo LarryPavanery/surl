@@ -8,14 +8,15 @@ import falcon
 import surl.helpers.shared as utils
 
 from base import TestBase
-        
-class TestManagerURL(TestBase):
+
+
+class TestUserStats(TestBase):
     def setUp(self):
-        super(TestManagerURL, self).setUp()
+        super(TestUserStats, self).setUp()
 
     def tearDown(self):
-        super(TestManagerURL, self).tearDown()
-        
+        super(TestUserStats, self).tearDown()
+
     def create_user(self):
         self.user_id = utils.fake_name()
         path = '/users'
@@ -26,14 +27,14 @@ class TestManagerURL(TestBase):
         self.assertEquals(self.user_id, response_user_id)
         self.assertEqual(self.srmock.status, falcon.HTTP_201)
         return response_user_id
-        
+
     def post_url(self):
         url = utils.fake_url()
         path = '/users/{0}/urls'.format(self.user_id)
         body = utils.encode_obj({'url': url})
         headers = {'Content-Type': 'application/json'}
         return self.simulate_post(path, body=body, headers=headers)
-        
+
     def get_stats_by_userid(self):
         path = '/users/{0}/stats'.format(self.user_id)
         self.response_get_stats = self.simulate_request(path)
@@ -46,6 +47,6 @@ class TestManagerURL(TestBase):
             self.post_url()
         self.get_stats_by_userid()
         self.assertEqual(len(self.stats), 10)
-        
 
-        
+
+

@@ -9,9 +9,9 @@ from surl.database.url_db import URLDB
 import falcon
 
 
-class URLStatistics(BaseResponse):
+class URLStats(BaseResponse):
     def __init__(self):
-        super(URLStatistics, self).__init__()
+        super(URLStats, self).__init__()
         self.url_db = URLDB()
 
     def on_get(self, req, resp, id):

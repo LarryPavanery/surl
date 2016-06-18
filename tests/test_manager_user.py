@@ -8,7 +8,8 @@ import falcon
 import surl.helpers.shared as utils
 
 from base import TestBase
-        
+
+
 class TestManagerUser(TestBase):
     def setUp(self):
         super(TestManagerUser, self).setUp()
@@ -28,7 +29,7 @@ class TestManagerUser(TestBase):
         response_user_id = utils.decode_obj(response[0])['id']
         self.assertEquals(self.user_id, response_user_id)
         self.assertEqual(self.srmock.status, falcon.HTTP_201)
-        
+
     def post_user_registered(self):
         path = '/users'
         body = utils.encode_obj({'id': self.user_id})
@@ -48,7 +49,7 @@ class TestManagerUser(TestBase):
         path = '/user/{0}'.format('whatsOo')
         self.simulate_delete(path)
         self.assertEqual(self.srmock.status, falcon.HTTP_404)
-        
+
     def test_user(self):
         self.post_user()
         self.post_user_registered()

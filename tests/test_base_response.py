@@ -22,24 +22,24 @@ class TestBaseResponse(testing.TestBase):
         self.assertEqual(self.srmock.status, falcon.HTTP_200)
         response = json.loads(result[0])
         self.assertTrue(response[u'status'] == 'ok')
-        
+
     def test_content_type_not_is_json(self):
         result = self.simulate_request('/')
         self.assertTrue('application/json' in dict(self.srmock.headers)['content-type'])
-        
+
     def test_encoding_is_utf8(self):
         result = self.simulate_request('/')
         self.assertTrue('charset=UTF-8' in dict(self.srmock.headers)['content-type'])
-        
+
     def test_return_body_override(self):
         class OverrideBaseResponse(base_response.BaseResponse):
             def on_get(self, req, resp, *args, **kwargs):
                 self.return_body(resp, {'some': 'thing'})
                 resp.status = falcon.HTTP_200
-        
+
         self.api.add_route('/', OverrideBaseResponse())
         result = self.simulate_request('/')
         self.assertEqual(self.srmock.status, falcon.HTTP_200)
         response = json.loads(result[0])
         self.assertTrue(response[u'some'] == 'thing')
-        
+

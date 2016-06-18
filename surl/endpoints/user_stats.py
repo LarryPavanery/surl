@@ -10,10 +10,10 @@ from surl.database.user_db import UserDB
 import falcon
 
 
-class UserStatistics(BaseResponse):
+class UserStats(BaseResponse):
 
     def __init__(self):
-        super(UserStatistics, self).__init__()
+        super(UserStats, self).__init__()
         self.user_db = UserDB()
         self.url_db = URLDB()
 

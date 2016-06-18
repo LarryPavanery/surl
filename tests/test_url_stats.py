@@ -8,18 +8,19 @@ import falcon
 import surl.helpers.shared as utils
 
 from base import TestBase
-        
-class TestManagerURL(TestBase):
+
+
+class TestURLStats(TestBase):
     def setUp(self):
-        super(TestManagerURL, self).setUp()
+        super(TestURLStats, self).setUp()
 
     def tearDown(self):
-        super(TestManagerURL, self).tearDown()
-    
+        super(TestURLStats, self).tearDown()
+
     def create_user_and_shorturl(self):
         self.user_id = self.create_user()
         self.response = self.post_url()
-        
+
     def create_user(self):
         user_id = utils.fake_name()
         path = '/users'
@@ -30,30 +31,30 @@ class TestManagerURL(TestBase):
         self.assertEquals(user_id, response_user_id)
         self.assertEqual(self.srmock.status, falcon.HTTP_201)
         return response_user_id
-        
+
     def post_url(self):
         url = utils.fake_url()
         path = '/users/{0}/urls'.format(self.user_id)
         body = utils.encode_obj({'url': url})
         headers = {'Content-Type': 'application/json'}
         return self.simulate_post(path, body=body, headers=headers)
-        
+
     def get_urls(self):
         self.id_surl = utils.decode_obj(self.response[0])['shorturl'].split('/')[-1]
         path = '/urls/{0}'.format(self.id_surl)
         self.simulate_request(path)
         self.assertEqual(self.srmock.status, falcon.HTTP_301)
-        
+
     def get_stats(self):
         path = '/stats/{0}'.format(self.id_surl)
         self.response_get_stats = self.simulate_request(path)
         self.assertEqual(self.srmock.status, falcon.HTTP_200)
         self.hits = utils.decode_obj(self.response_get_stats[0])['hits']
-        
+
     def increment_hits(self):
         self.get_urls()
         self.get_stats()
-        
+
     def test_get_stats_by_id(self):
         self.create_user_and_shorturl()
         self.increment_hits()
@@ -63,4 +64,4 @@ class TestManagerURL(TestBase):
         for i in range(1000):
             self.increment_hits()
         self.assertEqual(self.hits, 1002)
-        
+

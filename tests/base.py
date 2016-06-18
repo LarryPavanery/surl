@@ -3,6 +3,7 @@ import unittest
 import surl.api.server as server
 from falcon import testing
 
+
 class TestBase(unittest.TestCase):
 
     def setUp(self):

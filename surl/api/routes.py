@@ -18,10 +18,10 @@ class Routes(object):
         _manager_user = simport.load(_refs['api_v1_manager_user'])()
         _manager_url = simport.load(_refs['api_v1_manager_url'])()
 
-        '''statistics'''
-        _system_statistics = simport.load(_refs['api_v1_system_statistics'])()
-        _user_statistics = simport.load(_refs['api_v1_user_statistics'])()
-        _url_statistics = simport.load(_refs['api_v1_url_statistics'])()
+        '''stats'''
+        _system_stats = simport.load(_refs['api_v1_system_stats'])()
+        _user_stats = simport.load(_refs['api_v1_user_stats'])()
+        _url_stats = simport.load(_refs['api_v1_url_stats'])()
 
         self.map_resources = {
             "/": _base,
@@ -29,9 +29,9 @@ class Routes(object):
             '/user/{userId}': _manager_user,
             '/urls/{id}': _manager_url,
             '/users/{userId}/urls': _manager_url,
-            '/stats': _system_statistics,
-            '/stats/{id}': _url_statistics,
-            '/users/{userId}/stats': _user_statistics
+            '/stats': _system_stats,
+            '/stats/{id}': _url_stats,
+            '/users/{userId}/stats': _user_stats
         }
 
     def get(self):

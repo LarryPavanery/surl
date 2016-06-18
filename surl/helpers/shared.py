@@ -63,9 +63,13 @@ def load_redis_config():
 
 def log_enable():
     configs = load_configs()
-    print(load_configs())
     return configs.get('DEFAULT', 'debug').lower() == 'true'
 
+
+def size_top_urls():
+    configs = load_configs()
+    return int(configs.get('DEFAULT', 'size_top_urls'))
+    
 
 def encode_obj(obj):
     return json.dumps(obj, ensure_ascii=False).encode('utf8')
