@@ -3,24 +3,34 @@
 __author__ = "Larry_Pavanery
 '''
 
-from constants import API_VERSION
+from constants import UNIVERSE_COMBINATIONS
 from ConfigParser import RawConfigParser
+from constants import API_VERSION
 from datetime import datetime
-from time import time
 from faker import Factory
+from time import time
 
-import base64
 
 import pytz
 import ujson as json
 
 
-def shorturl(url):
-    return '%s%s' % (root_url(), base64_url(url))
+def shorturl(id_url):
+    return '%s%s' % (root_url(), id_url)
 
 
-def base64_url(url):
-    return base64.b64encode(url)
+def get_index_id_url(indexs):
+    length = length_id_url()
+    for i in range(length):
+        index = indexs[i]
+        if index < len(UNIVERSE_COMBINATIONS) - 1:
+            indexs[i] += 1
+            return indexs
+        indexs[i] = 0
+        continue
+    else:
+        '''full combination'''
+        return [-1 for i in range(length)]
 
 
 def root_url():
@@ -66,10 +76,15 @@ def log_enable():
     return configs.get('DEFAULT', 'debug').lower() == 'true'
 
 
+def length_id_url():
+    configs = load_configs()
+    return int(configs.get('DEFAULT', 'length_id_url'))
+
+
 def size_top_urls():
     configs = load_configs()
     return int(configs.get('DEFAULT', 'size_top_urls'))
-    
+
 
 def encode_obj(obj):
     return json.dumps(obj, ensure_ascii=False).encode('utf8')

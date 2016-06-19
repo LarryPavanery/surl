@@ -43,7 +43,7 @@ class TestSystemStats(TestBase):
 
     def test_get_stats(self):
         self.create_user()
-        for i in range(500):
+        for i in range(5):
             self.post_url()
         self.get_stats()
         self.assertEqual(len(self.system_stats), 3)

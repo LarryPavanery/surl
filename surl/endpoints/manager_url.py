@@ -55,34 +55,23 @@ class ManagerURL(BaseResponse):
             )
 
         url = data['url']
-        shorturl = utils.shorturl(url)
-        if self.user_db.user_has_url(user_id, shorturl):
+        id_url = self.url_db.create_id_url()
+        if self.user_db.user_has_url(user_id, id_url):
             raise falcon.HTTPError(
                 falcon.HTTP_409,
-                'The URL exists in system',
+                'The URL exists to the user',
                 'Please try with another URL'
             )
 
-        if not self.url_db.exists(shorturl):
-            new_url = self.url_db.save(url, shorturl)
-            if new_url:
-                self.return_body(resp, new_url, falcon.HTTP_201)
-            else:
-                raise falcon.HTTPError(
-                    falcon.HTTP_400,
-                    'Short URL not created',
-                    'Please try again or contact support'
-                )
-
-        '''TODO Facade pattern? to manager persister...'''
-        self.user_db.update_user(user_id, shorturl)
+        new_url = self.url_db.save(url, id_url)
+        self.user_db.update_user(user_id, id_url)
+        self.return_body(resp, new_url, falcon.HTTP_201)
 
     def _delete(self, resp, url_id):
-        id = utils.root_url() + url_id
-        if not self.url_db.exists(id):
+        if not self.url_db.exists(url_id):
             raise falcon.HTTPError(
                 falcon.HTTP_404,
                 'Short URL not found',
                 'Request did not return any records'
             )
-        self.url_db.delete(id)
+        self.url_db.delete(url_id)
