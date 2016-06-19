@@ -29,7 +29,5 @@ class UserStats(BaseResponse):
     def process_stats(self, resp, user):
         stats = []
         for url_key in user['url_keys']:
-            '''TODO: change this!'''
-            key = url_key.split('/')[-1]
-            stats.append(self.url_db.get(key))
+            stats.append(self.url_db.get(url_key))
         self.return_body(resp, stats, falcon.HTTP_200)
