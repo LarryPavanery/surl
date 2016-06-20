@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -o xtrace
 
+APP_NAME="surl"
+BASE_DIR=$(pwd)
+
 function install_redis(){
 	echo "[Database] Install and configure Redis..."
 	wget http://download.redis.io/redis-stable.tar.gz
@@ -13,6 +16,7 @@ function install_redis(){
 	make test
 	cd ../utils
 	sudo ./install_server.sh
+	cd $BASE_DIR
 }
 
 function install_pip_venvw() {
@@ -23,9 +27,9 @@ function install_pip_venvw() {
     
 	echo "[ENV.] Install and configure virtualenvwrapper..."
 	sudo pip install virtualenvwrapper
-	echo "export WORKON_HOME=$HOME/.virtualenvs" > ~/.surlenv
-	echo "source /usr/local/bin/virtualenvwrapper.sh" >> ~/.surlenv
-	source ~/.surlenv
+	echo "export WORKON_HOME=$HOME/.virtualenvs" >> ~/.bashrc
+	echo "source /usr/local/bin/virtualenvwrapper.sh" >> ~/.bashrc
+	source ~/.bashrc
 }
  
 function create_env_install_deps(){
@@ -34,18 +38,27 @@ function create_env_install_deps(){
 	
 	echo "[ENV.] Installing requirements..."
 	pip install -r requirements.txt
+	deactivate
+}
 
+function install_deps_env(){
+	sudo apt-get update
+        sudo apt-get install -yqq python-dev tk8.5
 }
 
 function install(){
-	sudo apt-get update
-	sudo apt-get install -yqq python-dev tk8.5
+	if echo $BASE_DIR | grep $APP_NAME > /dev/null ; then
+		install_deps_env
+		install_redis
+		install_pip_venvw
+		create_env_install_deps
 
-	install_redis
-	install_pip_venvw
-	create_env_install_deps
-	
-	echo "[!] done."
+		echo "[!] done."
+	else
+		echo "You are out of the application directory, enter in directory to install correctly"
+	fi
 }
 
 install
+
+set +x
